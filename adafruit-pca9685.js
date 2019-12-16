@@ -1,12 +1,12 @@
 /*
  * module adafruit-pca9685.js
  * node  module for controlling the Adafruit 16-channel 12-bit PWM/Servo driver
- * requires: i2c, sleep 
+ * requires: i2c, sleep
  * Usage makePwm = require('adafruit-pca9685')
  * pwm = makePwm({options})  address=0x40 for out of box Adafruit module
  * pwm.setFreq(freq); default freq = 50, yeilding 20 ms period, which servos like
  * pwm.setFreq(freq, correction); needed if you want to tune the freqency
- * pwm.setPwm(channel, on, off); 
+ * pwm.setPwm(channel, on, off);
  * pwm.setPulse(channel, pulse); convenience for setting servos - on = 0 and off = pulse/(#uS per bit)
  * Author: John Treacy
  * copyright 2013-2017 John Treacy
@@ -34,14 +34,14 @@ var
     __ALLLED_OFF_H = 0xFD,
 
     // external modules
-    I2C = require('i2c'),
+    I2C = require('i2c-bus'),
     sleep = require('sleep');
 
 //-------------------------- END MODULE SCOPED VARIABLES ------------------------------
 
 //-------------------------- BEGIN MODULE PRIVATE/UTILITY METHODS ----------------------------
 
-// method i2cSend: utility function to wrap i2c.writeBytes 
+// method i2cSend: utility function to wrap i2c.writeBytes
 //   cmd is one of the PCA9685 addresses above, values is context dependent on which command
 //   see the PCA9685 datasheet for details
 i2cSend = function (i2c, cmd, values) {
@@ -98,7 +98,7 @@ isValidFreq = function (freq) {
 
 
 
-// ** Constructor makePwm() ** 
+// ** Constructor makePwm() **
 // This is the only object exported by the module using require().
 // It is then used to create the pwm instance
 // takes optional argument object with the following parameters
@@ -109,7 +109,7 @@ isValidFreq = function (freq) {
 //    debug: make additional debug functionality available
 
 makePwm = function (arg_map) {
-    
+
     var pwm = new Object;
 
     // set device parameters using arg_map values or defaults
@@ -119,7 +119,7 @@ makePwm = function (arg_map) {
     pwm.deviceName = arg_map['device'] || '/dev/i2c-1';
     pwm.correctionFactor = arg_map['correctionFactor'] || 1.0;
 
-    
+
     // method setFreq(frequency, correctionfactor)
     // correction factor may be needed to get actual frequency - ymmv
     // I have found that 1.118 correction factor with 50 hz gives me very close to 50
@@ -158,7 +158,7 @@ makePwm = function (arg_map) {
         i2cSend(this.i2c, __LED0_OFF_H + 4 * channel, pulseoff >> 8);
     };
 
-    // Set a pulse of duration given in usecs on a channel 
+    // Set a pulse of duration given in usecs on a channel
 
     pwm.setPulse = function (channel, pulse) {
         if (!isValidChannel(channel)) throw new Error("Channel must be between 0 and 15");
@@ -171,7 +171,7 @@ makePwm = function (arg_map) {
         this.setPwm(channel, 0, Math.floor(pulse));
     };
 
-    // method stop() 
+    // method stop()
     // leave everything in a clean state
     pwm.stop = function () {
         clearAll(this.i2c);
@@ -185,7 +185,7 @@ makePwm = function (arg_map) {
 
     // Turn on debugging if asked
     if (arg_map['debug'] === true) {
-        
+
         pwm.debug = {
             getFrequency: function () {
                 return pwm.frequency;
@@ -200,7 +200,6 @@ makePwm = function (arg_map) {
 };
 //-------------------------  END PWM PUBLIC METHODS  -------------------------
 
-// export only the constructor 
+// export only the constructor
 
 module.exports = makePwm;
-
